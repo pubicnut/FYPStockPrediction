@@ -18,3 +18,4 @@ user_input = st.text_input("ENTER STOCK SYMBOL")
 
 df = yf.download(user_input, start = '2016-11-09', end = '2021-11-09', progress = False )
 st.text(df.head(6))
+st .text('hi')
