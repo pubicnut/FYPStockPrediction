@@ -5,4 +5,5 @@ Keras-Preprocessing==1.1.2
 numpy==1.20.1
 pandas==1.2.4
 base58==2.1.1
+matplotlib==3.3.4
 
