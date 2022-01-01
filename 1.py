@@ -138,7 +138,7 @@ def prediction_test():
     X_test = np.array(X_test)
     st.text(X_test)
     st.text(X_test.shape)
-    X_test = np.array(X_test).astype('float32')
+    X_test = np.array(X_test).astype(np.float32)
     stock_dates = df.index
     real_stock_price = df.iloc[:,3:4]
     predicted_stock_price = model.predict(X_test)
