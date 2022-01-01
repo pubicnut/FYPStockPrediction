@@ -8,3 +8,5 @@ base58==2.1.1
 matplotlib==3.3.4
 plotly==5.5.0
 cufflinks==0.17.3
+scikit-learn==0.24.1
+scikit-image==0.18.1
