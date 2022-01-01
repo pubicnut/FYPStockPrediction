@@ -105,8 +105,6 @@ def prediction_test():
         y_train.append(training_set_scaled[i, 0])
     X_train, y_train = np.array(X_train), np.array(y_train)
     X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-    st.text(X_train)
-    st.text(X_train.shape)
     #Training model
     model = Sequential()
     #Adding the first LSTM layer and some Dropout regularisation
@@ -139,7 +137,8 @@ def prediction_test():
         X_test.append(inputs[i-60:i, 0])
     X_test = np.array(X_test)
     X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-
+    st.text(X_test)
+    st.text(X_test.shape)
     stock_dates = df.index
     real_stock_price = df.iloc[:,3:4]
     predicted_stock_price = model.predict(X_test)
