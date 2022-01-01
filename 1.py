@@ -97,15 +97,16 @@ def prediction_test():
     df.isna().any()
     sc = MinMaxScaler(feature_range = (0, 1))
     training_set_scaled = sc.fit_transform(training_set)
-    x_train = []
+    X_train = []
     y_train = []
 
     for i in range(60, entry_count):  #60 because take data from day 1 to day 60, then making predicition on 61st day. #
-        x_train.append(training_set_scaled[i-60:i, 0])
+        X_train.append(training_set_scaled[i-60:i, 0])
         y_train.append(training_set_scaled[i, 0])
-    X_train, y_train = np.array(x_train), np.array(y_train)
+    X_train, y_train = np.array(X_train), np.array(y_train)
     X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-
+    st.text(X_train)
+    st.text(X_train.shape)
     #Training model
     model = Sequential()
     #Adding the first LSTM layer and some Dropout regularisation
