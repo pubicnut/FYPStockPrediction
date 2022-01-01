@@ -10,4 +10,9 @@ plotly==5.5.0
 cufflinks==0.17.3
 scikit-learn==0.24.1
 scikit-image==0.18.1
-tensorflow
+tensorflow==2.7.0
+tensorflow-estimator==2.7.0
+tensorflow-io-gcs-filesystem==0.23.1
+tensorboard==2.7.0
+tensorboard-data-server==0.6.1
+tensorboard-plugin-wit==1.8.0
