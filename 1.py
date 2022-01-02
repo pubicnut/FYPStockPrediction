@@ -152,22 +152,17 @@ def prediction_test():
     var_real_stock_price = real_stock_price
     var_predicted_stock_price = predicted_stock_price
     var_stock_dates = stock_dates
-# if 'predicted_stock_price' not in st.session.state:
-#     st.session.state['predicted_stock_price'] = ''
+
+
 
 if st.button("run prediction"):
     prediction_test()
     pred_date = var_real_stock_price.index[len(var_real_stock_price)-1]
     pred_date += timedelta(days=1)
-# pred_date_2 = pred_date
-# pred_date_2 +=timedelta(days=1)
     new_index = (list(var_real_stock_price.index))
     new_index.append(pred_date)
-# new_index.append(pred_date_2)
     new_index = pd.Index(new_index)
-# print(new_index)
     predicted_stock_price_2 = var_predicted_stock_price.set_index(new_index)
-    # predicted_stock_price_2.head(250)
     df = pd.concat([predicted_stock_price_2,var_real_stock_price ], axis=1)
     df.tail()
     chart = df
