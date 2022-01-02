@@ -135,10 +135,10 @@ def prediction_test():
     X_test = []
     for i in range(60, 307):
         X_test.append(inputs[i-60:i, 0])
-    X_test = np.array(X_test)
-    st.text(X_test)
-    st.text(X_test.shape)
-    X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
+    X_test_pred = np.array(X_test)
+    st.text(X_test_pred)
+    st.text(X_test_pred.shape)
+    X_test = np.reshape(X_test_pred, (X_test_pred.shape[0], X_test_pred.shape[1]))
     stock_dates = df.index
     real_stock_price = df.iloc[:,3:4]
     predicted_stock_price = model.predict(X_test)
