@@ -135,7 +135,6 @@ def prediction_test():
     X_test = []
     for i in range(60, 307):
         X_test.append(inputs[i-60:i, 0])
-    st.text(X_test.shape)
     X_test_pred = np.array(X_test)
     st.text(X_test_pred)
     st.text(X_test_pred.shape)
