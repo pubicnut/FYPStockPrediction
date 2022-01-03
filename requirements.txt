@@ -19,6 +19,5 @@ tensorboard==2.7.0
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.0
 tblib==1.7.0
-python==3.8.8
 pyspark==3.2.0
 pyarrow==4.0.1
