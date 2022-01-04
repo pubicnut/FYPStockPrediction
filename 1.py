@@ -44,6 +44,7 @@ if current_year:
 
 #retrieve particular stock data
 df = yf.download(user_input, start = start_date, end = end_date, progress = False )
+# st.text("df length {}, start: {}, end: {}".format(str(len(df)), start_date, end_date))
 
 import plotly.graph_objs as go
 
@@ -103,7 +104,7 @@ def prediction_test():
     for i in range(60, entry_count):  #60 because take data from day 1 to day 60, then making predicition on 61st day. #
         X_train.append(training_set_scaled[i-60:i, 0])
         y_train.append(training_set_scaled[i, 0])
-    X_train, y_train = np.array(X_train), np.array(y_train)
+    X_train, y_train = np.asarray(X_train).astype(np.float32), np.asarray(y_train).astype(np.float32)
     X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
     #Training model
     model = Sequential()
@@ -123,22 +124,24 @@ def prediction_test():
     model.add(Dense(units = 1))
     model.compile(optimizer = "adam", loss = "mean_squared_error")
     # Fitting the RNN to the Training set
-    model.fit(X_train, y_train, epochs = 100, batch_size = 32)
+    model.fit(X_train, y_train, epochs = 3, batch_size = 32)
 
     price_data = df["Close"]
-    test_set = pd.DataFrame(price_data)
+    price_data.fillna(value=0, inplace=True)
 
     dataset_total = pd.concat((df['Close'], price_data), axis = 0)
     inputs = dataset_total[len(dataset_total) - len(price_data) - 60:].values
     inputs = inputs.reshape(-1,1)
     inputs = sc.transform(inputs)
     X_test = []
-    for i in range(60, 307):
-        X_test.append(inputs[i-60:i, 0])
-    X_test_pred = np.array(X_test)
-    st.text(X_test_pred)
-    st.text(X_test_pred.shape)
-    X_test = np.reshape(X_test_pred, (X_test_pred.shape[0], X_test_pred.shape[1]))
+    for i in range(60, len(df) + 61):
+        X_test.append(np.array(inputs[i-60:i, 0]).tolist())
+    # X_test_pred = np.asarray(X_test).astype(np.float32)
+    X_test_len = max(map(len, X_test))
+    X_test_pred = np.array([xi+[0.0]*(X_test_len-len(xi)) for xi in X_test]).astype(np.float32)
+
+    # X_test = np.reshape(X_test_pred, (X_test_pred.shape[0], X_test_pred.shape[1]))
+    X_test = X_test_pred
     stock_dates = df.index
     real_stock_price = df.iloc[:,3:4]
     predicted_stock_price = model.predict(X_test)
@@ -157,13 +160,24 @@ def prediction_test():
 
 if st.button("run prediction"):
     prediction_test()
-    pred_date = var_real_stock_price.index[len(var_real_stock_price)-1]
-    pred_date += timedelta(days=1)
-    new_index = (list(var_real_stock_price.index))
-    new_index.append(pred_date)
-    new_index = pd.Index(new_index)
-    predicted_stock_price_2 = var_predicted_stock_price.set_index(new_index)
-    df = pd.concat([predicted_stock_price_2,var_real_stock_price ], axis=1)
-    df.tail()
+    data_predicted_stock_price = var_predicted_stock_price["Predicted Stock Price"].to_numpy()
+
+    date_index = (list(var_real_stock_price.index))
+    for i in range(0, len(data_predicted_stock_price) - len(date_index)):
+        pred_date = date_index[len(date_index)-1]
+        pred_date += timedelta(days=1)
+        date_index.append(pred_date)
+
+    data_real_stock_price = var_real_stock_price["Close"].to_numpy().tolist()
+    for i in range(0, len(data_predicted_stock_price) - len(data_real_stock_price)):
+        data_real_stock_price.append(np.nan)
+
+    df = pd.DataFrame(
+        {
+            "Predicted Stock Price": data_predicted_stock_price,
+            "Real Stock Price": data_real_stock_price,
+        },
+        index=date_index
+    )
     chart = df
     st.line_chart(chart)
