@@ -25,6 +25,14 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 from keras.callbacks import EarlyStopping
 
+m = st.markdown("""
+<style>
+div.stButton > button:first-child { 
+    position:relative;left:30%;
+}
+
+</style>""", unsafe_allow_html=True)
+
 #title of proj
 st.title('Stock Prediction')
 
@@ -37,7 +45,7 @@ start_date = st.sidebar.date_input("Start date", datetime.date(2021, 1, 1)) #rem
 end_date = st.sidebar.date_input("End date", datetime.date(2021, 12, 22))#remember to change to datetime.date.today()
 
 #current year button
-current_year = st.sidebar.button("Current year")
+current_year = st.sidebar.button("Current year", key = 'sidebar')
 if current_year:
     start_date = date(date.today().year, 1, 1)
     end_date = date(date.today().year, 12, 31)
@@ -123,6 +131,7 @@ def prediction_test():
     # Adding the output layer
     model.add(Dense(units = 1))
     model.compile(optimizer = "adam", loss = "mean_squared_error")
+
     # Fitting the RNN to the Training set
     model.fit(X_train, y_train, epochs = 100, batch_size = 32)
 
@@ -134,7 +143,7 @@ def prediction_test():
     inputs = inputs.reshape(-1,1)
     inputs = sc.transform(inputs)
     X_test = []
-    for i in range(60, len(df) + 61):
+    for i in range(60, len(df) + 62):
         X_test.append(np.array(inputs[i-60:i, 0]).tolist())
     # X_test_pred = np.asarray(X_test).astype(np.float32)
     X_test_len = max(map(len, X_test))
