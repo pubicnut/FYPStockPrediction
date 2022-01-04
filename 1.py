@@ -124,7 +124,7 @@ def prediction_test():
     model.add(Dense(units = 1))
     model.compile(optimizer = "adam", loss = "mean_squared_error")
     # Fitting the RNN to the Training set
-    model.fit(X_train, y_train, epochs = 3, batch_size = 32)
+    model.fit(X_train, y_train, epochs = 100, batch_size = 32)
 
     price_data = df["Close"]
     price_data.fillna(value=0, inplace=True)
