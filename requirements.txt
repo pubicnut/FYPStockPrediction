@@ -12,12 +12,9 @@ cufflinks==0.17.3
 scikit-learn==0.24.1
 scikit-image==0.18.1
 scipy==1.6.2
-tensorflow==2.7.0
+tensorflow-cpu==2.7.0
 tensorflow-estimator==2.7.0
 tensorflow-io-gcs-filesystem==0.23.1
 tensorboard==2.7.0
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.0
-tblib==1.7.0
-pyspark==3.2.0
-pyarrow==4.0.1
