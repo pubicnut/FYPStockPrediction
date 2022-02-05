@@ -1,8 +1,12 @@
+import streamlit as st
+import numpy as np
+import pandas as pd
 import streamlit as st #
 import pandas as pd #
 import yfinance as yf #
 import datetime
 from datetime import date
+from datetime import datetime
 from datetime import timedelta
 import time
 import requests
@@ -24,78 +28,13 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 from keras.callbacks import EarlyStopping
-
-m = st.markdown("""
-<style>
-div.stButton > button:first-child { 
-    position:relative;left:30%;
-}
-
-</style>""", unsafe_allow_html=True)
-
-#title of proj
-st.title('Stock Prediction')
-
-#enter stock symbol
-st.sidebar.subheader('Select ')
-user_input = st.sidebar.text_input("ENTER STOCK SYMBOL")
-#select date range if you want, or you can just see current time stock
-st.sidebar.subheader('Select date range')
-start_date = st.sidebar.date_input("Start date", datetime.date(2021, 1, 1)) #remember to change to 2015-1-1
-end_date = st.sidebar.date_input("End date", datetime.date(2021, 12, 22))#remember to change to datetime.date.today()
-
-#current year button
-current_year = st.sidebar.button("Current year", key = 'sidebar')
-if current_year:
-    start_date = date(date.today().year, 1, 1)
-    end_date = date(date.today().year, 12, 31)
-
-#retrieve particular stock data
-df = yf.download(user_input, start = start_date, end = end_date, progress = False )
-# st.text("df length {}, start: {}, end: {}".format(str(len(df)), start_date, end_date))
-
-import plotly.graph_objs as go
-
-#Interval required 1 minute
-# data = yf.download(tickers=user_input, period='5d', interval='1m')
-data = yf.download(tickers=user_input, start = start_date, end = end_date)
-
-#declare figure
-fig = go.Figure()
-
-#Candlestick
-fig.add_trace(go.Candlestick(x=data.index,
-                open=data['Open'],
-                high=data['High'],
-                low=data['Low'],
-                close=data['Close'], name = 'market data'))
-# Add titles
-fig.update_layout(
-    title= user_input + ' Share Price',
-    yaxis_title='Stock Price (USD per Shares)',
-    width =700, height=700 )
-
-# X-Axes #2h\1d\2d\1wk\1mt\3mt\6mt\1y\2y\5y\
-fig.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list([
-            dict(count=1, label="1D", step="day", stepmode="todate"),
-            dict(count=7, label="1 week", step="day", stepmode="todate"),
-            dict(count=1, label="1 month", step="month", stepmode="todate"),
-            dict(count=3, label="3 month", step="month", stepmode="todate"),
-            dict(count=6, label="6 month", step="month", stepmode="todate"),
-            dict(count=1, label="1 Year", step="year", stepmode="todate"),
-            dict(count=5, label="5 Year", step="year", stepmode="todate"),
-            dict(step="all")
-        ])
-    )
-)
-#Show
-st.plotly_chart(fig)
-
+with open('style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>',unsafe_allow_html=True)
 
 def prediction_test():
+
+    # df = yf.download(user_input_gbl, start = start_date_gbl, end = datetime.date.today(), progress = False )
+    df = yf.download(user_input_gbl, start = start_date_gbl, end = date(2021,12,24), progress = False )
     chart_data = pd.DataFrame(
          df["Close"])
 
@@ -133,7 +72,7 @@ def prediction_test():
     model.compile(optimizer = "adam", loss = "mean_squared_error")
 
     # Fitting the RNN to the Training set
-    model.fit(X_train, y_train, epochs = 100, batch_size = 32)
+    model.fit(X_train, y_train, epochs = 1, batch_size = 32)
 
     price_data = df["Close"]
     price_data.fillna(value=0, inplace=True)
@@ -165,28 +104,40 @@ def prediction_test():
     var_predicted_stock_price = predicted_stock_price
     var_stock_dates = stock_dates
 
+def app():
+    global user_input_gbl
+    global start_date_gbl
+    st.title('View Stock Prediction')
+    col1, col2, = st.columns(2)
+    with col1:
+        user_input = st.text_input("ENTER STOCK SYMBOL")
+        user_input_gbl = user_input
+        df = yf.download(user_input)
+        date_index = str(df.index[0])
+        dt_obj = datetime.strptime(date_index, "%Y-%m-%d %H:%M:%S")
+        start_date_gbl = dt_obj
+            #select date range if you want, or you can just see current time stock
 
+    if st.button("run prediction"):
+        prediction_test()
+        data_predicted_stock_price = var_predicted_stock_price["Predicted Stock Price"].to_numpy()
 
-if st.button("run prediction"):
-    prediction_test()
-    data_predicted_stock_price = var_predicted_stock_price["Predicted Stock Price"].to_numpy()
+        date_index = (list(var_real_stock_price.index))
+        for i in range(0, len(data_predicted_stock_price) - len(date_index)):
+            pred_date = date_index[len(date_index)-1]
+            pred_date += timedelta(days=1)
+            date_index.append(pred_date)
 
-    date_index = (list(var_real_stock_price.index))
-    for i in range(0, len(data_predicted_stock_price) - len(date_index)):
-        pred_date = date_index[len(date_index)-1]
-        pred_date += timedelta(days=1)
-        date_index.append(pred_date)
+        data_real_stock_price = var_real_stock_price["Close"].to_numpy().tolist()
+        for i in range(0, len(data_predicted_stock_price) - len(data_real_stock_price)):
+            data_real_stock_price.append(np.nan)
 
-    data_real_stock_price = var_real_stock_price["Close"].to_numpy().tolist()
-    for i in range(0, len(data_predicted_stock_price) - len(data_real_stock_price)):
-        data_real_stock_price.append(np.nan)
-
-    df = pd.DataFrame(
-        {
-            "Predicted Stock Price": data_predicted_stock_price,
-            "Real Stock Price": data_real_stock_price,
-        },
-        index=date_index
-    )
-    chart = df
-    st.line_chart(chart)
+        df = pd.DataFrame(
+            {
+                "Predicted Stock Price": data_predicted_stock_price,
+                "Real Stock Price": data_real_stock_price,
+            },
+            index=date_index
+        )
+        chart = df
+        st.line_chart(chart)
