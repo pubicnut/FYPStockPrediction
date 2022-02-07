@@ -13,7 +13,7 @@ def page_settings():
         new TradingView.widget(
         {
         "container_id": "technical-analysis",
-        
+
         "width": 1000,
         "height": 610,
         "symbol": "AAPL",
