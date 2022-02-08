@@ -43,6 +43,9 @@ def page_settings():
         """,
         height=1000, width=1050
     )
+    components.html(
+        
+    )
 
 def app():
     page_settings()
